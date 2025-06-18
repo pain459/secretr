@@ -1,0 +1,28 @@
+services:
+  secretr_pg1:
+    # image: postgres:15
+    build: .  # TO-DO: Take a decision of jq vs sed/awk to avoid build at this state.
+    container_name: secretr_pg1
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: temp_init_pw  # Dummy password for bootstrap only
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - secretr-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+        reservations:
+          cpus: "0.25"
+          memory: "256M"
+
+networks:
+  secretr-net:
+    external: true

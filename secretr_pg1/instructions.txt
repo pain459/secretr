@@ -1,0 +1,6 @@
+1. Ensure the service secretr_vault1 is up and running.
+2. Create a password for user admin in vault using below command.
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"value": "Password@123"}' \ 
+     http://localhost:8200/secret/admin    
+3. Create a folder under secretr_pg1 named pgdata to store all the data from database.
