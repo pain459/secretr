@@ -1,0 +1,21 @@
+Boot strap instruction.
+TO-DO: Automate the bootstrapper instructions.
+
+1. Create Docker network (only once, remove after testing)
+docker network create secretr-net
+
+2. Generate encryption key once (if not already done, needs package cryptography, tested in python 3.13)
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" > vault.key
+
+3. Create a folder inside secretr-vault1 as vault-data where store.enc will be created by the script itself.
+
+4. Start the vault
+docker-compose up --build -d
+
+5. Test the API
+curl http://localhost:8200/secret/postgres
+
+
+General:
+
+Do not commit the vault.key and vault-data folder to the repo.

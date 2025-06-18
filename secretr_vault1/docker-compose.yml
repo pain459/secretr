@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  secretr_vault1:
+    build: .
+    container_name: secretr_vault1
+    ports:
+      - "8200:8200"
+    networks:
+      - secretr-net
+    volumes:
+      - ./vault.key:/vault/vault.key:ro
+      # - ./store.enc:/vault/store.enc
+      - ./vault-data:/vault/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: "128M"
+        reservations:
+          cpus: "0.10"
+          memory: "64M"
+
+networks:
+  secretr-net:
+    external: true
