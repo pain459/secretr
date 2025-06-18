@@ -6,6 +6,40 @@ curl -X POST -H "Content-Type: application/json" \
 3. Create a folder under secretr_pg1 named pgdata to store all the data from database.
 
 
+Adding the data into database and retrieving the data. All this data is dummy.
+I used dbeaver to access the database and execute these queries.
+
+-- Create app user with password
+CREATE USER appuser WITH PASSWORD 'AppUser@123';
+
+-- Create table
+CREATE TABLE demo_data (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+-- Grant access
+GRANT CONNECT ON DATABASE data_a TO appuser;
+GRANT USAGE ON SCHEMA public TO appuser;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO appuser;
+
+-- Insert demo data
+INSERT INTO demo_data (name) VALUES
+('Alpha'),
+('Beta'),
+('Gamma');
+
+-- Access the data via container.
+docker exec -it 97983061fbf3 psql -U appuser -d data_a -c "SELECT * FROM demo_data;"
+ id | name  
+----+-------
+  1 | Alpha
+  2 | Beta
+  3 | Gamma
+(3 rows)
+
+
+
 #TO-DO: Explore the password storing schema later with below sample call.
 
 curl -X POST -H "Content-Type: application/json" \
