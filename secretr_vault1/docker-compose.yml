@@ -9,9 +9,9 @@ services:
     networks:
       - secretr-net
     volumes:
-      - ./vault.key:/vault/vault.key:ro
+      - ./vault.key:/vault/vault.key:ro    # User must create this.
       # - ./store.enc:/vault/store.enc
-      - ./vault-data:/vault/data
+      - ./vault-data:/vault/data           # store.enc will be created here.
     deploy:
       resources:
         limits:

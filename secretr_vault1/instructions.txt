@@ -5,6 +5,8 @@ TO-DO: Automate the bootstrapper instructions.
 docker network create secretr-net
 
 2. Generate encryption key once (if not already done, needs package cryptography, tested in python 3.13)
+mkdir -p secretr_vault1/vault-data
+cd secretr_vault1
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" > vault.key
 
 3. Create a folder inside secretr-vault1 as vault-data where store.enc will be created by the script itself.
