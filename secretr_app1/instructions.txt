@@ -1,0 +1,4 @@
+-> test calls going as expected.
+
+curl http://localhost:8000/data; echo 
+[{"id":1,"name":"Alpha"},{"id":2,"name":"Beta"},{"id":3,"name":"Gamma"}]

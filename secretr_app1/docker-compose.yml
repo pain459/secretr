@@ -1,0 +1,25 @@
+services:
+  secretr_app1:
+    build: .
+    container_name: secretr_app1
+    ports:
+      - "8000:8000"
+    environment:
+      VAULT_URL: http://secretr_vault1:8200/secret/appuser
+      DB_HOST: secretr_pg1
+      DB_NAME: data_a
+      DB_USER: appuser
+    networks:
+      - secretr-net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "256M"
+        reservations:
+          cpus: "0.25"
+          memory: "128M"
+
+networks:
+  secretr-net:
+    external: true
