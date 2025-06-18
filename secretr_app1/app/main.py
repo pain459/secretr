@@ -5,6 +5,7 @@ import psycopg2
 import requests
 import os
 from datetime import datetime
+import time
 
 app = FastAPI()
 
@@ -22,6 +23,8 @@ VAULT_URL = os.getenv("VAULT_URL", "http://secretr_vault1:8200/secret/appuser")
 DB_HOST = os.getenv("DB_HOST", "secretr_pg1")
 DB_NAME = os.getenv("DB_NAME", "data_a")
 DB_USER = os.getenv("DB_USER", "appuser")
+last_vault_refresh_ts = 0
+cooldown_secs = 10
 
 # 30 minute cache for password (1 entry only)
 password_cache = TTLCache(maxsize=1, ttl=1800)
@@ -51,13 +54,36 @@ def get_password_from_vault():
 
 def get_db_connection():
     """Create a new DB connection using cached Vault password."""
-    password = get_password_from_vault()
-    return psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=password,
-        host=DB_HOST
-    )
+    global last_vault_refresh_ts
+    try:
+        password = get_password_from_vault()
+        return psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=password,
+            host=DB_HOST
+        )
+    except psycopg2.OperationalError as e:
+        # Fast fail implementation
+        if "password authentication failed" in str(e):
+            now = time.time()
+            if now - last_vault_refresh_ts > cooldown_secs:
+                logging.warning("DB password failure detected. Refreshing from Vault.")
+                last_vault_refresh_ts = now
+                password_cache.clear()
+
+                # Retry after clearing cache
+                password = get_password_from_vault()
+                return psycopg2.connect(
+                    dbname=DB_NAME,
+                    user=DB_USER,
+                    password=password,
+                    host=DB_HOST
+                )
+            else:
+                logging.error("DB password failed but within cooldown window. Skipping vault refresh.")
+        raise
+
 
 @app.get("/healthz")
 def health_check():
