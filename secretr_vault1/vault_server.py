@@ -32,21 +32,38 @@ def decrypt_store() -> dict:
             store = json.loads(decrypted.decode())
     return store
 
-@app.route("/secret/postgres", methods=["GET"])
-def get_password():
+@app.route("/secret/<key>", methods=["GET"])
+def get_secret(key):
     store = decrypt_store()
-    return jsonify({"password": store["postgres"]})
+    if key not in store:
+        return jsonify({"error": "Key not found"}), 404
+    return jsonify({key: store[key]})
 
-@app.route("/secret/postgres", methods=["POST"])
-def update_password():
+@app.route("/secret/<key>", methods=["POST"])
+def set_secret(key):
     data = request.get_json()
-    password = data.get("password")
-    if not password:
-        return jsonify({"error": "Missing password"}), 400
+    value = data.get("value")
+    if not value:
+        return jsonify({"error": "Missing value"}), 400
     store = decrypt_store()
-    store["postgres"] = password
+    store[key] = value
     encrypt_store(store)
-    return jsonify({"message": "Password updated"})
+    return jsonify({"message": f"Secret '{key}' updated"})
+
+@app.route("/secret/<key>", methods=["DELETE"])
+def delete_secret(key):
+    store = decrypt_store()
+    if key not in store:
+        return jsonify({"error": "Key not found"}), 404
+    del store[key]
+    encrypt_store(store)
+    return jsonify({"message": f"Secret '{key}' deleted"})
+
+@app.route("/secrets", methods=["GET"])
+def list_secrets():
+    store = decrypt_store()
+    return jsonify({"keys": list(store.keys())})
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8200)

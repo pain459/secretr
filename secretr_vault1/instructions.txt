@@ -17,6 +17,22 @@ docker-compose up --build -d
 5. Test the API
 curl http://localhost:8200/secret/postgres
 
+CRUD 
+
+# Add a new secret
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"value": "secret123"}' \
+     http://localhost:8200/secret/api-token
+
+# Get that secret
+curl http://localhost:8200/secret/api-token
+
+# List all keys
+curl http://localhost:8200/secrets
+
+# Delete the secret
+curl -X DELETE http://localhost:8200/secret/api-token
+
 
 General:
 
