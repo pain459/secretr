@@ -24,7 +24,7 @@ def encrypt_store(data: dict):
 def decrypt_store() -> dict:
     if not os.path.exists(ENC_FILE):
         password = Fernet.generate_key().decode()
-        store = {"postgres": password}
+        store = {} # Removing default keys at startup.
         encrypt_store(store)
     else:
         with open(ENC_FILE, "rb") as f:
