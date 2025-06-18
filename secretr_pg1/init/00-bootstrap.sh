@@ -3,12 +3,12 @@ set -e
 
 echo "[INFO] Waiting for Vault to become available..."
 
-until curl -s http://secretr_vault1:8200/secret/postgres >/dev/null; do
+until curl -s http://secretr_vault1:8200/secret/admin >/dev/null; do
   sleep 1
 done
 
 echo "[INFO] Fetching admin password from vault..."
-ADMIN_PASS=$(curl -s http://secretr_vault1:8200/secret/postgres | jq -r .password)
+ADMIN_PASS=$(curl -s http://secretr_vault1:8200/secret/admin | jq -r .admin)  #TO-DO: remove the most generic name for user.
 
 if [ -z "$ADMIN_PASS" ] || [ "$ADMIN_PASS" = "null" ]; then
   echo "[ERROR] Admin password is empty or not found in vault."
