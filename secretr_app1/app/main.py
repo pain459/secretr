@@ -43,6 +43,26 @@ def get_db_connection():
         host=DB_HOST
     )
 
+@app.get("/healthz")
+def health_check():
+    return {"status": "alive"}
+
+@app.get("/readiness")
+def readiness_check():
+    try:
+        # Try vault first
+        _ = get_password_from_vault()
+
+        # Then try DB connection
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                _ = cur.fetchone()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Readiness failed: {str(e)}")
+
+    return {"status": "ready"}
+
 @app.get("/data")
 def get_data():
     try:
