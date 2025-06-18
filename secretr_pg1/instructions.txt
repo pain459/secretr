@@ -4,3 +4,10 @@ curl -X POST -H "Content-Type: application/json" \
      -d '{"value": "Password@123"}' \ 
      http://localhost:8200/secret/admin    
 3. Create a folder under secretr_pg1 named pgdata to store all the data from database.
+
+
+#TO-DO: Explore the password storing schema later with below sample call.
+
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"value": "Password@123"}' \
+     http://localhost:8200/secret/admin
